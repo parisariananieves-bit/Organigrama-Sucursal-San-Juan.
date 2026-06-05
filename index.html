@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Organigrama — Sucursal San Juan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',sans-serif;background:#f0f1f5;color:#111}
+#app{display:flex;flex-direction:column;height:100vh}
+
+#topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;background:#fff;
+  border-bottom:1px solid #e5e7eb;
+  flex-shrink:0;gap:12px;flex-wrap:wrap;
+}
+#topbar-left{display:flex;align-items:center;gap:10px}
+.org-badge{
+  background:#7F77DD;color:#fff;font-size:10px;font-weight:600;
+  letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase;white-space:nowrap
+}
+#titulo-display{
+  font-size:17px;font-weight:600;color:#111;cursor:pointer;
+  border-bottom:2px dashed transparent;padding-bottom:1px;transition:border-color .2s
+}
+#titulo-display:hover{border-color:#d1d5db}
+#titulo-input{
+  font-size:17px;font-weight:600;border:none;border-bottom:2px solid #7F77DD;
+  outline:none;background:transparent;color:#111;display:none;min-width:160px
+}
+.edit-ico{cursor:pointer;color:#9ca3af;font-size:15px;transition:color .15s}
+.edit-ico:hover{color:#7F77DD}
+
+#topbar-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tb-btn{
+  display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;
+  padding:6px 12px;border-radius:8px;border:1px solid #e5e7eb;
+  background:#f9fafb;cursor:pointer;color:#6b7280;transition:all .15s;
+  font-family:'Inter',sans-serif;white-space:nowrap
+}
+.tb-btn:hover{background:#f3f4f6;color:#111}
+.tb-btn.primary{background:#7F77DD;color:#fff;border-color:#534AB7}
+.tb-btn.primary:hover{background:#534AB7}
+.tb-btn.blue{background:#378ADD;color:#fff;border-color:#185FA5}
+.tb-btn.blue:hover{background:#185FA5}
+.divider{width:1px;height:22px;background:#e5e7eb;margin:0 2px}
+#zoom-badge{font-size:11px;font-weight:600;color:#6b7280;min-width:36px;text-align:center}
+
+#legend-bar{
+  display:flex;gap:14px;flex-wrap:wrap;padding:8px 20px;
+  background:#fff;border-bottom:1px solid #f0f1f3;flex-shrink:0
+}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:#6b7280}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+#canvas-wrap{
+  flex:1;overflow:auto;position:relative;padding:16px;
+}
+canvas#org{display:block;border-radius:12px;background:#fff;cursor:default}
+
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(10,10,20,.45);
+  z-index:200;align-items:center;justify-content:center
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:#fff;border:1px solid #e5e7eb;border-radius:16px;
+  padding:24px;width:400px;max-width:95vw;
+  box-shadow:0 20px 60px rgba(0,0,0,.15)
+}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-header h3{font-size:15px;font-weight:600;color:#111}
+.modal-close{
+  cursor:pointer;color:#9ca3af;font-size:18px;line-height:1;
+  background:none;border:none;padding:4px 7px;border-radius:6px;font-family:'Inter',sans-serif
+}
+.modal-close:hover{background:#f3f4f6;color:#111}
+.field{margin-bottom:14px}
+.field label{
+  display:block;font-size:10px;font-weight:600;color:#9ca3af;
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px
+}
+.field input,.field select{
+  width:100%;padding:8px 11px;font-size:13px;font-weight:500;
+  border-radius:8px;border:1px solid #e5e7eb;background:#f9fafb;color:#111;
+  font-family:'Inter',sans-serif;transition:border-color .15s
+}
+.field input:focus,.field select:focus{outline:none;border-color:#7F77DD;background:#fff}
+.color-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.color-opt{
+  display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:8px;
+  border:1.5px solid #e5e7eb;cursor:pointer;font-size:12px;font-weight:500;
+  color:#374151;transition:all .15s;user-select:none
+}
+.color-opt:hover{border-color:#c4b5fd;background:#faf5ff}
+.color-opt.selected{border-color:#7F77DD;background:#EEEDFE;color:#3C3489}
+.color-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.modal-footer{
+  display:flex;gap:8px;justify-content:flex-end;
+  margin-top:20px;padding-top:16px;border-top:1px solid #f3f4f6
+}
+.mf-btn{
+  padding:7px 18px;border-radius:8px;font-size:13px;font-weight:500;
+  cursor:pointer;font-family:'Inter',sans-serif;border:1px solid transparent;transition:all .15s
+}
+.mf-save{background:#7F77DD;color:#fff;border-color:#534AB7}
+.mf-save:hover{background:#534AB7}
+.mf-cancel{background:#fff;border-color:#e5e7eb;color:#374151}
+.mf-cancel:hover{background:#f9fafb}
+.mf-del{background:#fff;border-color:#fca5a5;color:#b91c1c;margin-right:auto}
+.mf-del:hover{background:#fef2f2}
+
+#count-bar{
+  padding:6px 20px;background:#f9fafb;border-top:1px solid #f0f1f3;
+  font-size:11px;color:#9ca3af;flex-shrink:0;display:flex;gap:16px
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="topbar">
+  <div id="topbar-left">
+    <span class="org-badge">Organigrama</span>
+    <span id="titulo-display">Sucursal San Juan</span>
+    <input id="titulo-input" type="text" value="Sucursal San Juan"/>
+    <span class="edit-ico" onclick="toggleTitle()" title="Editar título"><i class="ti ti-edit"></i></span>
+  </div>
+  <div id="topbar-right">
+    <button class="tb-btn primary" onclick="openAdd()"><i class="ti ti-plus"></i> Agregar persona</button>
+    <button class="tb-btn blue" onclick="exportPNG()"><i class="ti ti-download"></i> Exportar PNG</button>
+    <div class="divider"></div>
+    <button class="tb-btn" onclick="zoomOut()" title="Alejar"><i class="ti ti-minus"></i></button>
+    <span id="zoom-badge">70%</span>
+    <button class="tb-btn" onclick="zoomIn()" title="Acercar"><i class="ti ti-plus"></i></button>
+    <button class="tb-btn" onclick="resetZoom()" title="Resetear vista"><i class="ti ti-refresh"></i></button>
+  </div>
+</div>
+
+<div id="legend-bar">
+  <span class="leg"><span class="leg-dot" style="background:#7F77DD"></span>Dirección</span>
+  <span class="leg"><span class="leg-dot" style="background:#1D9E75"></span>Gerencia</span>
+  <span class="leg"><span class="leg-dot" style="background:#378ADD"></span>Supervisión</span>
+  <span class="leg"><span class="leg-dot" style="background:#EF9F27"></span>Administración</span>
+  <span class="leg"><span class="leg-dot" style="background:#D85A30"></span>Atención / BDC</span>
+  <span class="leg"><span class="leg-dot" style="background:#888780"></span>Soporte</span>
+</div>
+
+<div id="canvas-wrap">
+  <canvas id="org"></canvas>
+</div>
+
+<div id="count-bar">
+  <span id="count-total"></span>
+  <span>Hacé clic en cualquier nodo para editar · Doble clic en el título para renombrarlo</span>
+</div>
+
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-ttl">Agregar persona</h3>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="field"><label>Nombre completo</label><input id="f-name" type="text" placeholder="Ej: María García"/></div>
+    <div class="field"><label>Cargo</label><input id="f-role" type="text" placeholder="Ej: Supervisora de ventas"/></div>
+    <div class="field"><label>Reporta a</label><select id="f-parent"></select></div>
+    <div class="field"><label>Categoría</label><div class="color-grid" id="color-grid"></div></div>
+    <div class="modal-footer">
+      <button class="mf-btn mf-del" id="btn-del" onclick="deleteNode()"><i class="ti ti-trash"></i> Eliminar</button>
+      <button class="mf-btn mf-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="mf-btn mf-save" onclick="saveNode()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATS=[
+  {key:'dir',  label:'Dirección',      fill:'#7F77DD',dark:'#3C3489'},
+  {key:'ger',  label:'Gerencia',       fill:'#1D9E75',dark:'#085041'},
+  {key:'sup',  label:'Supervisión',    fill:'#378ADD',dark:'#0C447C'},
+  {key:'adm',  label:'Administración', fill:'#EF9F27',dark:'#633806'},
+  {key:'aten', label:'Atención/BDC',   fill:'#D85A30',dark:'#712B13'},
+  {key:'sop',  label:'Soporte',        fill:'#888780',dark:'#444441'},
+];
+const CAT=Object.fromEntries(CATS.map(c=>[c.key,c]));
+
+let nodes=[
+  {id:0,  name:'Gastón Rossi',         role:'CEO',                        parent:null,color:'dir'},
+  {id:1,  name:'Andrés Maiorana',      role:'Gerente de posventa',        parent:0,   color:'ger'},
+  {id:2,  name:'Nicolás Jazmín',       role:'Gerente Contable / Admin',   parent:0,   color:'ger'},
+  {id:3,  name:'Darío Ruiz',           role:'Gerente PDA',                parent:0,   color:'ger'},
+  {id:4,  name:'Pedro Sauter',         role:'Gerente Venta Directa',      parent:0,   color:'ger'},
+  {id:5,  name:'Juan Pablo Almanza',   role:'Supervisor Contable',        parent:2,   color:'sup'},
+  {id:6,  name:'Mathías Lorente',      role:'Contador',                   parent:5,   color:'sop'},
+  {id:7,  name:'Enzo Romarion',        role:'Tesorería',                  parent:6,   color:'sop'},
+  {id:8,  name:'Sofía Vera',           role:'Calidad y RRHH',             parent:2,   color:'sop'},
+  {id:9,  name:'Gabriela Domínguez',   role:'Supervisora Admin PDA',      parent:2,   color:'sup'},
+  {id:10, name:'David Lariche',        role:'Supervisor Admin Directa',   parent:2,   color:'sup'},
+  {id:11, name:'Jorge Blanco',         role:'Supervisor Comercial PDA',   parent:3,   color:'sup'},
+  {id:12, name:'Hector Ventrice',      role:'Supervisor de repuestos',    parent:1,   color:'sup'},
+  {id:13, name:'Joaquín Portillo',     role:'Jefe de taller',             parent:1,   color:'sup'},
+  {id:14, name:'Maximiliano González', role:'Marketing',                  parent:1,   color:'sop'},
+  {id:15, name:'Yamila Gómez',         role:'Recepcionista',              parent:1,   color:'aten'},
+  {id:16, name:'Leonel Sierra',        role:'Agente de BDC',              parent:1,   color:'aten'},
+  {id:17, name:'Alejandra Díaz',       role:'Agente de BDC',              parent:1,   color:'aten'},
+  {id:18, name:'Renzo Cantó',          role:'Asesor Comercial PDA',       parent:11,  color:'sop'},
+  {id:19, name:'Gimena Paez',          role:'Asesora Comercial PDA',      parent:11,  color:'sop'},
+  {id:20, name:'Leandro Vargas',       role:'Asesor Plan de ahorro',      parent:11,  color:'sop'},
+  {id:21, name:'Martin Oro',           role:'Asesor venta directa',       parent:4,   color:'sop'},
+  {id:22, name:'Marcelo Bustos',       role:'Asesor venta directa',       parent:4,   color:'sop'},
+  {id:23, name:'Carlos Rojo',          role:'Asesor venta directa',       parent:4,   color:'sop'},
+  {id:24, name:'Daniel Olguín',        role:'Asesor venta directa',       parent:4,   color:'sop'},
+  {id:25, name:'Nicolas Cardenas',     role:'Asesor de repuestos',        parent:12,  color:'sop'},
+  {id:26, name:'Daniela Martínez',     role:'Asesora de repuestos',       parent:12,  color:'sop'},
+  {id:27, name:'Diego Bobadilla',      role:'Analista de Garantías',      parent:12,  color:'sop'},
+  {id:28, name:'Ivana Zárate',         role:'Admin. venta directa',       parent:10,  color:'adm'},
+  {id:29, name:'Verónica Ortiz',       role:'Admin. venta directa',       parent:10,  color:'adm'},
+  {id:30, name:'Victoria Turcuman',    role:'Admin. plan de ahorro',      parent:9,   color:'adm'},
+];
+
+let nextId=31,editingId=null,zoom=0.75,hoverId=null;
+const BW=190,BH=66,HG=22,VG=68,MAR=60;
+const cv=document.getElementById('org'),ctx=cv.getContext('2d');
+let pos={};
+
+function kids(id){return nodes.filter(n=>n.parent===id)}
+function desc(id){let r=[];kids(id).forEach(c=>{r.push(c);r=r.concat(desc(c.id))});return r}
+function sw(id){const ch=kids(id);if(!ch.length)return BW;return Math.max(BW,ch.reduce((s,c)=>s+sw(c.id),0)+HG*(ch.length-1))}
+function layNode(id,x,y){
+  pos[id]={x,y};
+  const ch=kids(id);if(!ch.length)return;
+  const tot=ch.reduce((s,c)=>s+sw(c.id),0)+HG*(ch.length-1);
+  let cx=x+BW/2-tot/2;
+  ch.forEach(c=>{const s=sw(c.id);layNode(c.id,cx+s/2-BW/2,y+BH+VG);cx+=s+HG});
+}
+function computeLayout(){
+  pos={};
+  const roots=nodes.filter(n=>n.parent===null);
+  let sx=0;
+  roots.forEach(r=>{layNode(r.id,sx,0);sx+=sw(r.id)+HG*3});
+  const vals=Object.values(pos);
+  const minX=Math.min(...vals.map(p=>p.x));
+  Object.keys(pos).forEach(id=>{pos[id].x+=MAR-minX;pos[id].y+=MAR});
+}
+function initials(name){
+  const p=name.trim().split(' ').filter(Boolean);
+  return(p[0]?p[0][0]:''+(p[1]?p[1][0]:'')).toUpperCase().slice(0,2);
+}
+function roundRect(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.arcTo(x+w,y,x+w,y+r,r);
+  c.lineTo(x+w,y+h-r);c.arcTo(x+w,y+h,x+w-r,y+h,r);
+  c.lineTo(x+r,y+h);c.arcTo(x,y+h,x,y+h-r,r);
+  c.lineTo(x,y+r);c.arcTo(x,y,x+r,y,r);c.closePath();
+}
+function render(){
+  computeLayout();
+  const ap=Object.values(pos);
+  const maxX=Math.max(...ap.map(p=>p.x))+BW+MAR;
+  const maxY=Math.max(...ap.map(p=>p.y))+BH+MAR;
+  const dpr=window.devicePixelRatio||1;
+  cv.width=maxX*zoom*dpr;cv.height=maxY*zoom*dpr;
+  cv.style.width=(maxX*zoom)+'px';cv.style.height=(maxY*zoom)+'px';
+  ctx.setTransform(dpr*zoom,0,0,dpr*zoom,0,0);
+  ctx.clearRect(0,0,maxX,maxY);
+
+  nodes.forEach(n=>{
+    if(n.parent===null)return;
+    const f=pos[n.id],t=pos[n.parent];if(!f||!t)return;
+    const x1=f.x+BW/2,y1=f.y,x2=t.x+BW/2,y2=t.y+BH,mid=(y1+y2)/2;
+    const cat=CAT[n.color];
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.bezierCurveTo(x1,mid,x2,mid,x2,y2);
+    ctx.strokeStyle=cat.fill+'33';ctx.lineWidth=5;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.bezierCurveTo(x1,mid,x2,mid,x2,y2);
+    ctx.strokeStyle=cat.fill+'77';ctx.lineWidth=1.5;ctx.stroke();
+  });
+
+  nodes.forEach(n=>{
+    const p=pos[n.id];if(!p)return;
+    const cat=CAT[n.color];
+    const isRoot=n.parent===null,isHover=n.id===hoverId;
+    const x=p.x,y=p.y,w=BW,h=BH,r=10;
+    ctx.save();
+    if(isHover){ctx.translate(x+w/2,y+h/2);ctx.scale(1.05,1.05);ctx.translate(-(x+w/2),-(y+h/2))}
+    roundRect(ctx,x,y,w,h,r);
+    ctx.fillStyle=cat.fill;ctx.fill();
+    if(isRoot){
+      roundRect(ctx,x-2.5,y-2.5,w+5,h+5,r+2);
+      ctx.strokeStyle=cat.dark;ctx.lineWidth=3;ctx.stroke();
+    }
+    const ar=15,ax=x+14+ar,ay=y+h/2;
+    ctx.beginPath();ctx.arc(ax,ay,ar,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.22)';ctx.fill();
+    ctx.font='600 9.5px Inter,sans-serif';
+    ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(initials(n.name),ax,ay);
+    const tx=ax+ar+8,maxW=w-(tx-x)-10;
+    ctx.textAlign='left';
+    ctx.font='600 11.5px Inter,sans-serif';ctx.fillStyle='#fff';ctx.textBaseline='middle';
+    let nm=n.name;
+    while(ctx.measureText(nm).width>maxW&&nm.length>2)nm=nm.slice(0,-1);
+    if(nm!==n.name)nm=nm.slice(0,-1)+'…';
+    ctx.fillText(nm,tx,y+h*0.33);
+    ctx.font='400 9px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,0.85)';
+    const words=n.role.split(' ');
+    let line1='',line2='';
+    for(const w2 of words){
+      const test=line1?(line1+' '+w2):w2;
+      if(ctx.measureText(test).width<=maxW)line1=test;
+      else{line2=line2?(line2+' '+w2):w2}
+    }
+    if(line2&&ctx.measureText(line2).width>maxW){while(ctx.measureText(line2).width>maxW-10&&line2.length>2)line2=line2.slice(0,-1);line2=line2.slice(0,-1)+'…';}
+    if(line2){
+      ctx.fillText(line1,tx,y+h*0.60);
+      ctx.fillText(line2,tx,y+h*0.80);
+    }else{
+      ctx.fillText(line1,tx,y+h*0.68);
+    }
+    ctx.restore();
+  });
+
+  document.getElementById('zoom-badge').textContent=Math.round(zoom*100)+'%';
+  document.getElementById('count-total').textContent=nodes.length+' personas';
+}
+
+cv.addEventListener('click',e=>{
+  const r=cv.getBoundingClientRect(),mx=(e.clientX-r.left)/zoom,my=(e.clientY-r.top)/zoom;
+  for(const n of nodes){const p=pos[n.id];if(p&&mx>=p.x&&mx<=p.x+BW&&my>=p.y&&my<=p.y+BH){openEdit(n.id);break}}
+});
+cv.addEventListener('mousemove',e=>{
+  const r=cv.getBoundingClientRect(),mx=(e.clientX-r.left)/zoom,my=(e.clientY-r.top)/zoom;
+  let found=null;
+  for(const n of nodes){const p=pos[n.id];if(p&&mx>=p.x&&mx<=p.x+BW&&my>=p.y&&my<=p.y+BH){found=n.id;break}}
+  if(found!==hoverId){hoverId=found;cv.style.cursor=found!==null?'pointer':'default';render()}
+});
+
+function buildColorGrid(sel){
+  const g=document.getElementById('color-grid');g.innerHTML='';
+  CATS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='color-opt'+(c.key===sel?' selected':'');
+    d.innerHTML=`<span class="color-swatch" style="background:${c.fill}"></span>${c.label}`;
+    d.onclick=()=>{document.querySelectorAll('.color-opt').forEach(x=>x.classList.remove('selected'));d.classList.add('selected')};
+    g.appendChild(d);
+  });
+}
+function getSelColor(){
+  const idx=Array.from(document.querySelectorAll('.color-opt')).findIndex(x=>x.classList.contains('selected'));
+  return idx>=0?CATS[idx].key:'sop';
+}
+function fillParentSel(excId,selId){
+  const sel=document.getElementById('f-parent');
+  sel.innerHTML='<option value="">— Sin jefe (raíz) —</option>';
+  const excDesc=excId!==null?desc(excId).map(n=>n.id):[];
+  nodes.filter(n=>n.id!==excId&&!excDesc.includes(n.id)).forEach(n=>{
+    const o=document.createElement('option');
+    o.value=n.id;o.textContent=n.name+' · '+n.role;
+    if(n.id===selId)o.selected=true;
+    sel.appendChild(o);
+  });
+}
+function openEdit(id){
+  editingId=id;
+  const n=nodes.find(x=>x.id===id);
+  document.getElementById('modal-ttl').textContent='Editar persona';
+  document.getElementById('f-name').value=n.name;
+  document.getElementById('f-role').value=n.role;
+  document.getElementById('btn-del').style.display=n.parent===null?'none':'';
+  fillParentSel(id,n.parent);buildColorGrid(n.color);
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(),100);
+}
+function openAdd(){
+  editingId=null;
+  document.getElementById('modal-ttl').textContent='Agregar persona';
+  document.getElementById('f-name').value='';document.getElementById('f-role').value='';
+  document.getElementById('btn-del').style.display='none';
+  fillParentSel(null,0);buildColorGrid('sop');
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('f-name').focus(),100);
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open')}
+function saveNode(){
+  const name=document.getElementById('f-name').value.trim();
+  const role=document.getElementById('f-role').value.trim();
+  const color=getSelColor();
+  const pv=document.getElementById('f-parent').value;
+  const parent=pv!==''?parseInt(pv):null;
+  if(!name)return;
+  if(editingId!==null){
+    const n=nodes.find(x=>x.id===editingId);
+    n.name=name;n.role=role;n.color=color;n.parent=parent;
+  }else{
+    nodes.push({id:nextId++,name,role,color,parent});
+  }
+  closeModal();render();
+}
+function deleteNode(){
+  if(editingId===null)return;
+  if(!confirm('¿Eliminar a '+nodes.find(x=>x.id===editingId)?.name+' y todos sus dependientes?'))return;
+  desc(editingId).map(n=>n.id).concat(editingId).forEach(id=>{nodes=nodes.filter(x=>x.id!==id)});
+  closeModal();render();
+}
+function zoomIn(){zoom=Math.min(zoom+0.1,2.5);render()}
+function zoomOut(){zoom=Math.max(zoom-0.1,0.2);render()}
+function resetZoom(){zoom=0.75;render()}
+function exportPNG(){
+  const t=document.getElementById('titulo-display').textContent;
+  const old=zoom;zoom=1;render();
+  const a=document.createElement('a');
+  a.download='organigrama_'+t.replace(/\s+/g,'_').toLowerCase()+'.png';
+  a.href=cv.toDataURL('image/png');a.click();
+  zoom=old;render();
+}
+function toggleTitle(){
+  const d=document.getElementById('titulo-display'),inp=document.getElementById('titulo-input');
+  if(inp.style.display==='none'||!inp.style.display){
+    inp.value=d.textContent;d.style.display='none';
+    inp.style.display='inline-block';inp.focus();inp.select();
+  }else{
+    d.textContent=inp.value.trim()||'Sucursal San Juan';
+    d.style.display='';inp.style.display='none';
+    document.title='Organigrama — '+d.textContent;
+  }
+}
+document.getElementById('titulo-input').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape')toggleTitle()});
+document.getElementById('titulo-display').addEventListener('dblclick',toggleTitle);
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===document.getElementById('modal-overlay'))closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+render();
+</script>
+</body>
+</html>
