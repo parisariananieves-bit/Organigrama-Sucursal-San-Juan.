@@ -149,6 +149,7 @@ canvas#org{display:block;border-radius:12px;background:#fff;cursor:default}
   <span class="leg"><span class="leg-dot" style="background:#EF9F27"></span>Administración</span>
   <span class="leg"><span class="leg-dot" style="background:#D85A30"></span>Atención / BDC</span>
   <span class="leg"><span class="leg-dot" style="background:#888780"></span>Soporte</span>
+  <span class="leg"><span class="leg-dot" style="background:#0F6E56"></span>Asesor de servicio</span>
 </div>
 
 <div id="canvas-wrap">
@@ -188,6 +189,7 @@ const CATS=[
   {key:'adm',  label:'Administración', fill:'#EF9F27',dark:'#633806'},
   {key:'aten', label:'Atención/BDC',   fill:'#D85A30',dark:'#712B13'},
   {key:'sop',  label:'Soporte',        fill:'#888780',dark:'#444441'},
+  {key:'ase',  label:'Asesor de servicio', fill:'#0F6E56',dark:'#04342C'},
 ];
 const CAT=Object.fromEntries(CATS.map(c=>[c.key,c]));
 
@@ -210,16 +212,16 @@ let nodes=[
   {id:15, name:'Yamila Gómez',         role:'Recepcionista',              parent:1,   color:'aten'},
   {id:16, name:'Leonel Sierra',        role:'Agente de BDC',              parent:1,   color:'aten'},
   {id:17, name:'Alejandra Díaz',       role:'Agente de BDC',              parent:1,   color:'aten'},
-  {id:18, name:'Renzo Cantó',          role:'Asesor Comercial PDA',       parent:11,  color:'sop'},
-  {id:19, name:'Gimena Paez',          role:'Asesora Comercial PDA',      parent:11,  color:'sop'},
-  {id:20, name:'Leandro Vargas',       role:'Asesor Plan de ahorro',      parent:11,  color:'sop'},
-  {id:21, name:'Martin Oro',           role:'Asesor venta directa',       parent:4,   color:'sop'},
-  {id:22, name:'Marcelo Bustos',       role:'Asesor venta directa',       parent:4,   color:'sop'},
-  {id:23, name:'Carlos Rojo',          role:'Asesor venta directa',       parent:4,   color:'sop'},
-  {id:24, name:'Daniel Olguín',        role:'Asesor venta directa',       parent:4,   color:'sop'},
-  {id:25, name:'Nicolas Cardenas',     role:'Asesor de repuestos',        parent:12,  color:'sop'},
-  {id:26, name:'Daniela Martínez',     role:'Asesora de repuestos',       parent:12,  color:'sop'},
-  {id:27, name:'Diego Bobadilla',      role:'Analista de Garantías',      parent:12,  color:'sop'},
+  {id:18, name:'Renzo Cantó',          role:'Asesor Comercial PDA',       parent:11,  color:'ase'},
+  {id:19, name:'Gimena Paez',          role:'Asesora Comercial PDA',      parent:11,  color:'ase'},
+  {id:20, name:'Leandro Vargas',       role:'Asesor Plan de ahorro',      parent:11,  color:'ase'},
+  {id:21, name:'Martin Oro',           role:'Asesor venta directa',       parent:4,   color:'ase'},
+  {id:22, name:'Marcelo Bustos',       role:'Asesor venta directa',       parent:4,   color:'ase'},
+  {id:23, name:'Carlos Rojo',          role:'Asesor venta directa',       parent:4,   color:'ase'},
+  {id:24, name:'Daniel Olguín',        role:'Asesor venta directa',       parent:4,   color:'ase'},
+  {id:25, name:'Nicolas Cardenas',     role:'Asesor de repuestos',        parent:12,  color:'ase'},
+  {id:26, name:'Daniela Martínez',     role:'Asesora de repuestos',       parent:12,  color:'ase'},
+  {id:27, name:'Diego Bobadilla',      role:'Analista de Garantías',      parent:12,  color:'ase'},
   {id:28, name:'Ivana Zárate',         role:'Admin. venta directa',       parent:10,  color:'adm'},
   {id:29, name:'Verónica Ortiz',       role:'Admin. venta directa',       parent:10,  color:'adm'},
   {id:30, name:'Victoria Turcuman',    role:'Admin. plan de ahorro',      parent:9,   color:'adm'},
@@ -439,3 +441,4 @@ render();
 </script>
 </body>
 </html>
+
